@@ -29,7 +29,6 @@ let queueChannel = null;
 let retryTimeout = null;
 let previewTimeout = null;
 
-// YouTube API load timeout
 let apiLoadTimeout = setTimeout(() => {
     if (!player) {
         console.error('YouTube API failed to load');
@@ -213,6 +212,8 @@ function onPlayerReady(event) {
     if (player.mute) player.mute();
     isMuted = true;
     audioUnlocked = false;
+
+    resizePlayer();   // ensure cover after player loads
 
     if (pendingSongToPlay !== null) {
         const songIndex = pendingSongToPlay;
@@ -558,25 +559,45 @@ function setupCleanupOnExit() {
     });
 }
 
-// Fullscreen toggle logic
+// ──────────────────────────────────────
+// Dynamic player resize (cover 16:9)
+// ──────────────────────────────────────
+function resizePlayer() {
+    const container = document.getElementById('player-container');
+    const iframe = document.querySelector('#player-container iframe') || document.getElementById('player');
+    if (!container || !iframe) return;
+
+    const containerW = container.clientWidth;
+    const containerH = container.clientHeight;
+    const targetRatio = 16 / 9;
+    const containerRatio = containerW / containerH;
+
+    let newWidth, newHeight;
+    if (containerRatio > targetRatio) {
+        newHeight = containerH;
+        newWidth = containerH * targetRatio;
+    } else {
+        newWidth = containerW;
+        newHeight = containerW / targetRatio;
+    }
+
+    iframe.style.width = newWidth + 'px';
+    iframe.style.height = newHeight + 'px';
+}
+
+// Fullscreen toggle (with icon update)
 function initFullscreenToggle() {
     const btn = document.getElementById('fullscreen-toggle');
     if (!btn) return;
 
     btn.addEventListener('click', () => {
         if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.warn('Fullscreen request failed:', err);
-            });
+            document.documentElement.requestFullscreen().catch(err => console.warn(err));
         } else {
             document.exitFullscreen();
         }
     });
-
-    document.addEventListener('fullscreenchange', updateFullscreenIcon);
-    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
 }
-
 function updateFullscreenIcon() {
     const btn = document.getElementById('fullscreen-toggle');
     if (!btn) return;
@@ -591,8 +612,25 @@ function updateFullscreenIcon() {
     }
 }
 
+// ──────────────────────────────────────
+// Startup
+// ──────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     generateParticles();
     initSession();
     initFullscreenToggle();
+
+    // Resize player when window changes or enters fullscreen
+    window.addEventListener('resize', resizePlayer);
+    document.addEventListener('fullscreenchange', () => {
+        resizePlayer();
+        updateFullscreenIcon();
+    });
+    document.addEventListener('webkitfullscreenchange', () => {
+        resizePlayer();
+        updateFullscreenIcon();
+    });
+
+    // Run once after layout stabilises
+    setTimeout(resizePlayer, 200);
 });
