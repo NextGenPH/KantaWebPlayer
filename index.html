@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanta Karaoke TV Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="bg-glow"></div>
+    <div class="bg-particles" id="particles"></div>
+    <main class="app-container">
+        <header class="status-header">
+            <div class="brand">
+                <span class="brand-logo"><i class="fa-solid fa-microphone-lines"></i></span>
+                <span class="brand-name">KANTA<span class="accent-dot">.</span></span>
+            </div>
+            <div class="pairing-badge" id="persistent-badge">
+                <span class="pulse-indicator status-waiting" id="status-dot"></span>
+                <span class="badge-text" id="status-text">Generating code...</span>
+                <span class="badge-code" id="header-code">------</span>
+                <span class="cmd-feedback" id="cmd-feedback"></span>
+            </div>
+        </header>
+        <section class="video-section" id="video-section">
+            <div id="player-container">
+                <div id="player"></div>
+            </div>
+        </section>
+        <section class="screen idle-screen active" id="idle-screen">
+            <div class="idle-content">
+                <div class="device-mockup">
+                    <i class="fa-solid fa-tv screen-icon"></i>
+                    <div class="connection-wave">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <i class="fa-solid fa-mobile-screen remote-icon"></i>
+                </div>
+                <h1>Pair Your Device</h1>
+                <p class="instruction-lead">Open the Kanta mobile app and enter this pairing code:</p>
+                <div class="code-container">
+                    <div class="code-display" id="pairing-code">------</div>
+                </div>
+                <div class="tips-container">
+                    <div class="tip-item">
+                        <i class="fa-solid fa-wifi"></i>
+                        <span>No local network pairing required - works from anywhere!</span>
+                    </div>
+                    <div class="tip-item">
+                        <i class="fa-solid fa-list-ol"></i>
+                        <span>Add multiple songs to the queue from your remote app.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="screen waiting-screen" id="waiting-screen">
+            <div class="waiting-content">
+                <div class="waiting-spinner">
+                    <div class="spinner-ring"></div>
+                    <i class="fa-solid fa-music music-note-icon"></i>
+                </div>
+                <h2>Ready to Sing</h2>
+                <p>Waiting for a song to be added to the queue from your phone.</p>
+                <div class="control-help">
+                    <span>Use the remote app to search YouTube and tap <strong>Add to Queue</strong>.</span>
+                </div>
+            </div>
+        </section>
+        <section class="now-playing-overlay" id="now-playing-overlay">
+            <div class="now-playing-container">
+                <div class="song-details">
+                    <div class="thumbnail-wrapper">
+                        <img src="" alt="Thumbnail" id="song-thumbnail" class="song-thumbnail">
+                        <div class="playing-bars">
+                            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                        </div>
+                    </div>
+                    <div class="song-metadata">
+                        <span class="song-label">NOW PLAYING</span>
+                        <h2 class="song-title" id="song-title">Song Title</h2>
+                        <h3 class="song-artist" id="song-artist">Artist Name</h3>
+                    </div>
+                </div>
+                <div class="playback-controls-info">
+                    <div class="time-display">
+                        <span id="current-time">0:00</span>
+                        <span class="time-divider">/</span>
+                        <span id="total-time">0:00</span>
+                    </div>
+                    <div class="progress-container" id="progress-container">
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="next-preview" id="next-preview">
+            <span class="preview-label">UP NEXT</span>
+            <h4 class="preview-title" id="preview-title">Next Song Title</h4>
+        </div>
+        <div class="toast-container" id="toast-container" role="status" aria-live="polite"></div>
+        <div id="youtube-fallback" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; z-index:9999; background:rgba(15,23,42,0.95); padding:40px; border-radius:24px; color:white;">
+            <h2>⚠️ YouTube Could Not Load</h2>
+            <p style="margin:20px 0; opacity:0.8;">Check your internet connection or disable ad blockers.</p>
+            <button onclick="location.reload()" style="padding:12px 30px; background:#27AE60; border:none; border-radius:50px; color:white; font-weight:600; cursor:pointer; font-size:1rem;">Retry</button>
+        </div>
+    </main>
+    <script>
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    </script>
+    <script src="app.js"></script>
+</body>
+
+</html>
