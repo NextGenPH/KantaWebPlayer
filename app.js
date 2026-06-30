@@ -20,9 +20,9 @@ let progressInterval = null;
 let isUnloading = false;
 let retryCount = 0;
 const MAX_RETRIES = 5;
-let isMuted = true;                 // start muted for autoplay
+let isMuted = true;
 let pendingSongToPlay = null;
-let audioUnlocked = false;          // becomes true after one user gesture on TV
+let audioUnlocked = false;
 
 let sessionChannel = null;
 let queueChannel = null;
@@ -195,7 +195,7 @@ window.onYouTubeIframeAPIReady = function() {
             'showinfo': 0,
             'iv_load_policy': 3,
             'origin': window.location.origin,
-            'mute': 1,                // muted autoplay always works
+            'mute': 1,
             'playsinline': 1
         },
         events: {
@@ -248,7 +248,6 @@ function onPlayerError(event) {
     setTimeout(() => skipNext(), 3000);
 }
 
-// One-time overlay for TV remote (D‑pad friendly)
 function showOneTimeUnlockOverlay() {
     if (audioUnlocked || document.getElementById('audio-unlock-overlay')) return;
 
@@ -559,7 +558,41 @@ function setupCleanupOnExit() {
     });
 }
 
+// Fullscreen toggle logic
+function initFullscreenToggle() {
+    const btn = document.getElementById('fullscreen-toggle');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.warn('Fullscreen request failed:', err);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    });
+
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+}
+
+function updateFullscreenIcon() {
+    const btn = document.getElementById('fullscreen-toggle');
+    if (!btn) return;
+    const icon = btn.querySelector('i');
+    if (!icon) return;
+    if (document.fullscreenElement) {
+        icon.classList.remove('fa-expand');
+        icon.classList.add('fa-compress');
+    } else {
+        icon.classList.remove('fa-compress');
+        icon.classList.add('fa-expand');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     generateParticles();
     initSession();
+    initFullscreenToggle();
 });
